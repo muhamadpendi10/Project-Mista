@@ -19,7 +19,11 @@ Aplikasi ini dibangun untuk membantu admin memproses data dalam jumlah besar den
 - Processing history (planned)
 
 ## Project Status
-🚧 Development
+Development
 
 ## Author
 Muhamad Efendi Vivria (Pensky)
+=======
+# Project-Mista
+Web-based WhatsApp chat (.txt) parser to Excel using Laravel, FastAPI, and MySQL.
+>>>>>>> 375405a05949f22cd1689fdd1a5bb44c3ac43175
