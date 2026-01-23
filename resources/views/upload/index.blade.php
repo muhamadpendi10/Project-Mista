@@ -2,57 +2,69 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Upload File TXT</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Upload Data TXT</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    {{-- Tailwind CDN --}}
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-light">
+    @extends('layouts.admin')
+    @section('title', 'Upload Data')
+    @section('page-title', 'Upload Data TXT')
 
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
+    @section('content')
+    <div class="max-w-lg bg-white rounded-xl shadow p-6">
 
-            <div class="card shadow-sm">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">Upload File TXT</h5>
-                </div>
+        <p class="text-sm text-slate-500 mb-6">
+            Upload file data mentah (.txt) untuk diproses sistem
+        </p>
 
-                <div class="card-body">
+        {{-- Alert Success --}}
+        @if(session('success'))
+            <div class="mb-4 rounded-md bg-green-50 p-3 text-sm text-green-700">
+                {{ session('success') }}
+            </div>
+        @endif
 
-                    @if(session('success'))
-                        <div class="alert alert-success">
-                            {{ session('success') }}
-                        </div>
-                    @endif
+        {{-- Alert Error --}}
+        @if ($errors->any())
+            <div class="mb-4 rounded-md bg-red-50 p-3 text-sm text-red-700">
+                <ul class="list-disc list-inside">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
 
-                    @if ($errors->any())
-                        <div class="alert alert-danger">
-                            <ul class="mb-0">
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    @endif
+        <form action="/upload" method="POST" enctype="multipart/form-data" class="space-y-4">
+            @csrf
 
-                    <form action="/upload" method="POST" enctype="multipart/form-data">
-                        @csrf
-
-                        <div class="mb-3">
-                            <label class="form-label">File (.txt)</label>
-                            <input type="file" name="file" class="form-control" accept=".txt" required>
-                        </div>
-
-                        <button class="btn btn-primary w-100">
-                            Upload
-                        </button>
-                    </form>
-
-                </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">
+                    File TXT
+                </label>
+                <input
+                    type="file"
+                    name="file"
+                    accept=".txt"
+                    required
+                    class="block w-full text-sm text-slate-600
+                        file:mr-4 file:rounded-md file:border-0
+                        file:bg-slate-200 file:px-4 file:py-2
+                        file:text-slate-700 hover:file:bg-slate-300"
+                >
             </div>
 
-        </div>
+            <button
+                type="submit"
+                class="w-full rounded-md bg-slate-900 py-2 text-white
+                    hover:bg-slate-800 transition"
+            >
+                Upload File
+            </button>
+        </form>
     </div>
-</div>
+    @endsection
 
-</body>
 </html>
