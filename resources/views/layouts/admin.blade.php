@@ -24,14 +24,23 @@
                         Dashboard
                     </a>
 
+                    @if (auth()->user()->role === 'admin')
+                            <a href="/admin/devices?status=pending"
+                                class="block rounded-md px-4 py-2 hover:bg-slate-700 transition">
+                                    Device Management
+                            </a>
+                        </li>
+                    @endif
+
+
                     <a href="#"
-                    class="block rounded-md px-4 py-2 hover:bg-slate-700 transition">
-                        History Upload
+                        class="block rounded-md px-4 py-2 hover:bg-slate-700 transition">
+                            History Upload
                     </a>
 
                     <a href="/upload"
-                    class="block rounded-md px-4 py-2 hover:bg-slate-700 transition">
-                        Upload Data
+                        class="block rounded-md px-4 py-2 hover:bg-slate-700 transition">
+                            Upload Data
                     </a>
 
                 </nav>
