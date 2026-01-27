@@ -31,27 +31,44 @@ class AuthController extends Controller
 
         $user = Auth::user();
 
-        // generate device id
+        //ADMIN LANGSUNG MASUK
+        if ($user->role === 'admin') {
+            return redirect('/admin/devices');
+        }
+
         $deviceId = DeviceHelper::generate($request);
 
-        // cek device
+        // Cek device AKTIF
         $device = UserDevice::where('user_id', $user->id)
             ->where('device_id', $deviceId)
+            ->where('status', 'active')
             ->first();
 
-        // simpan device pertama
+        // Device belum pernah terdaftar → buat pending
         if (!$device) {
-            UserDevice::create([
-                'user_id'     => $user->id,
-                'device_id'   => $deviceId,
-                'device_name' => $request->userAgent(),
-                'ip_address'  => $request->ip(),
-                'status'      => 'active',
-            ]);
+            UserDevice::firstOrCreate(
+                [
+                    'user_id'   => $user->id,
+                    'device_id' => $deviceId,
+                ],
+                [
+                    'device_name' => $request->userAgent(),
+                    'ip_address'  => $request->ip(),
+                    'status'      => 'pending',
+                ]
+            );
+
+            Auth::logout();
+
+            return redirect('/login')
+                ->withErrors([
+                    'email' => 'Device menunggu persetujuan admin'
+                ]);
         }
+
+        // Device aktif → boleh masuk
         return redirect('/upload');
     }
-
 
     public function logout(Request $request)
     {
