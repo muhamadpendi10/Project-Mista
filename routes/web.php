@@ -11,12 +11,10 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout']);
 
 Route::middleware(['auth', 'admin'])->group(function () {
-    // Route::get('/admin', function () {
-    //     return 'HALAMAN ADMIN';
-    // });
     Route::get('/admin/devices', [AdminDeviceController::class, 'index']);
     Route::post('/admin/devices/{id}/approve', [AdminDeviceController::class, 'approve']);
-    Route::post('/admin/devices/{id}/revoked', [AdminDeviceController::class, 'reject']);
+    Route::post('/admin/devices/{id}/reject', [AdminDeviceController::class, 'reject']);
+    Route::post('/admin/devices/{id}/rename', [AdminDeviceController::class, 'rename']);
 });
 
 Route::middleware('auth')->group(function () {

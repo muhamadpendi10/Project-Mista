@@ -5,7 +5,28 @@
     <title>Admin Login</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="min-h-screen flex">
+<body class="min-h-screen flex bg-white">
+
+    {{-- ===== FLOATING ALERT LOGIN ===== --}}
+    @if ($errors->any() || session('success'))
+        <div
+            id="toast-alert"
+            class="
+                fixed top-8 left-1/2 -translate-x-1/2
+                px-6 py-3 rounded-xl shadow-lg
+                text-center font-medium
+                opacity-0 -translate-y-4
+                transition-all duration-500
+                z-50
+                {{ $errors->any()
+                    ? 'bg-red-500 text-white'
+                    : 'bg-gradient-to-r from-blue-600 to-green-500 text-white' }}
+            "
+        >
+            {{ $errors->first() ?? session('success') }}
+        </div>
+    @endif
+    {{-- =============================== --}}
 
     <!-- LEFT: BRANDING -->
     <div class="hidden md:flex w-1/2 bg-white items-center justify-center">
@@ -24,19 +45,12 @@
         </div>
     </div>
 
-
     <!-- RIGHT: LOGIN FORM -->
     <div class="w-full md:w-1/2 flex items-center justify-center bg-white">
         <div class="w-full max-w-md bg-white rounded-xl shadow-lg p-8">
             <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">
                 Login Admin
             </h2>
-
-            @if ($errors->any())
-                <div class="bg-red-100 text-red-700 p-3 rounded mb-4 text-sm">
-                    {{ $errors->first() }}
-                </div>
-            @endif
 
             <form method="POST" action="/login" class="space-y-4">
                 @csrf
@@ -69,7 +83,9 @@
 
                 <button
                     type="submit"
-                    class="w-full bg-blue-600 text-white py-2 rounded-lg font-semibold hover:bg-blue-700 transition"
+                    class="w-full bg-gradient-to-r from-blue-600 to-green-500
+                           text-white py-2 rounded-lg font-semibold
+                           hover:opacity-90 transition"
                 >
                     Login
                 </button>
@@ -80,6 +96,29 @@
             </p>
         </div>
     </div>
+
+    {{-- ===== TOAST SCRIPT ===== --}}
+    @if ($errors->any() || session('success'))
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const toast = document.getElementById('toast-alert');
+            if (!toast) return;
+
+            setTimeout(() => {
+                toast.classList.remove('opacity-0', '-translate-y-4');
+                toast.classList.add('opacity-100', 'translate-y-0');
+            }, 100);
+
+            setTimeout(() => {
+                toast.classList.add('opacity-0', '-translate-y-4');
+            }, 3000);
+
+            setTimeout(() => {
+                toast.remove();
+            }, 3500);
+        });
+    </script>
+    @endif
 
 </body>
 </html>

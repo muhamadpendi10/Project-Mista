@@ -38,25 +38,26 @@ class AuthController extends Controller
 
         $deviceId = DeviceHelper::generate($request);
 
-        // Cek device AKTIF
-        $device = UserDevice::where('user_id', $user->id)
-            ->where('device_id', $deviceId)
-            ->where('status', 'active')
-            ->first();
+        // ambil nama device terakhir milik user (jika ada)
+        $lastDeviceName = UserDevice::where('user_id', $user->id)
+        ->where('status', 'active')
+        ->latest()
+        ->value('device_name');
 
-        // Device belum pernah terdaftar → buat pending
+        $device = UserDevice::where('user_id', $user->id)
+        ->where('device_id', $deviceId)
+        ->latest()
+        ->first();
+
+        // BELUM PERNAH ADA → BUAT PENDING
         if (!$device) {
-            UserDevice::firstOrCreate(
-                [
-                    'user_id'   => $user->id,
-                    'device_id' => $deviceId,
-                ],
-                [
-                    'device_name' => $request->userAgent(),
-                    'ip_address'  => $request->ip(),
-                    'status'      => 'pending',
-                ]
-            );
+            UserDevice::create([
+                'user_id'     => $user->id,
+                'device_id'   => $deviceId,
+                'device_name' => $lastDeviceName ?? 'Device Baru',
+                'ip_address'  => $request->ip(),
+                'status'      => 'pending',
+            ]);
 
             Auth::logout();
 
@@ -66,10 +67,34 @@ class AuthController extends Controller
                 ]);
         }
 
-        // Device aktif → boleh masuk
-        return redirect('/upload');
-    }
+        // ADA TAPI BELUM AKTIF → JANGAN BUAT DATA BARU
+        if ($device->status === 'pending') {
+            Auth::logout();
 
+            return redirect('/login')
+                ->withErrors([
+                    'email' => 'Device menunggu persetujuan admin'
+                ]);
+        }
+
+        // ADA TAPI DI-REVOKE → BUAT PENDING BARU
+        if ($device->status === 'revoked') {
+        $device->update([
+            'status'      => 'pending',
+            'device_name' => $lastDeviceName ?? $device->device_name,
+            'ip_address'  => $request->ip(),
+        ]);
+
+        Auth::logout();
+
+        return redirect('/login')
+            ->withErrors([
+                'email' => 'Device menunggu persetujuan admin'
+            ]);
+        }
+        // Device aktif → boleh masuk
+        return redirect('/upload'); 
+    }
     public function logout(Request $request)
     {
         Auth::logout();
