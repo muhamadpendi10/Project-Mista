@@ -3,6 +3,7 @@
 use App\Helpers\DeviceHelper;
 use App\Http\Controllers\AdminDeviceController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UploadController;
 
@@ -21,3 +22,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/upload', [UploadController::class, 'index']);
     Route::post('/upload', [UploadController::class, 'store']);
 });
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'index'])
+        ->name('dashboard');
+});
+

@@ -27,7 +27,7 @@
         </div>
 
         <nav class="flex-1 px-3 py-4 space-y-1 text-sm">
-            <a href="#"
+            <a href="/dashboard"
                class="block rounded-md px-4 py-2 bg-white/20">
                 Dashboard
             </a>
