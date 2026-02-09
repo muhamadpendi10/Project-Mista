@@ -12,6 +12,7 @@ class WaUpload extends Model
     protected $fillable = [
         'user_id',
         'filename',
+        'file_path', 
         'total_rows',
         'created_at',
         'updated_at',

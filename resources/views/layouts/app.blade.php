@@ -1,16 +1,12 @@
 @php
-    $admin = auth()->user();
+    $user = auth()->user();
 @endphp
-
-@if (!$admin || $admin->role !== 'admin')
-    @php abort(403, 'Admin only'); @endphp
-@endif
 
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>@yield('title', 'Admin Panel')</title>
+    <title>@yield('title', 'Dashboard')</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     {{-- Tailwind --}}
@@ -28,20 +24,12 @@
     <aside class="w-64 bg-gradient-to-b from-blue-600 to-green-500
                   text-white flex flex-col">
 
-        <div class="p-4">
-            <div class="flex items-center gap-3">
-                <img
-                    <img
-                        src="{{ asset('images/login.png') }}"
-                        alt="Company Logo"
-                        class="h-8 w-8 object-contain"
-                    >
-
-                <span class="text-xl font-bold hover:bg-white/20 transition">
-                    Mista Admin
-                </span>
-            </div>
+        <div class="h-16 flex items-center px-6 border-b border-white/20">
+            <span class="text-lg font-bold tracking-wide">
+                MISTA
+            </span>
         </div>
+
         <nav class="flex-1 px-3 py-4 space-y-1 text-sm">
 
             <a href="/dashboard"
@@ -49,26 +37,30 @@
                 Dashboard
             </a>
 
-            {{-- UPLOAD --}}
+            {{-- UPLOAD (USER + ADMIN) --}}
             <a href="/upload"
                class="block rounded-md px-4 py-2 hover:bg-white/20 transition">
                 Upload Data
             </a>
 
+            {{-- HISTORY (USER + ADMIN) --}}
             <a href="/upload/history"
                class="block rounded-md px-4 py-2 hover:bg-white/20 transition">
                 History Upload
             </a>
 
-            <a href="/admin/devices?status=pending"
-               class="block rounded-md px-4 py-2 hover:bg-white/20 transition">
-                Device Management
-            </a>
+            {{-- ADMIN ONLY --}}
+            @if($user && $user->role === 'admin')
+                <a href="/admin/devices?status=pending"
+                   class="block rounded-md px-4 py-2 hover:bg-white/20 transition">
+                    Device Management
+                </a>
+            @endif
 
         </nav>
 
         <div class="px-4 py-3 text-xs text-white/70 border-t border-white/20">
-            Admin System
+            {{ $user?->role === 'admin' ? 'Admin Panel' : 'User Panel' }}
         </div>
     </aside>
 
@@ -82,17 +74,19 @@
                    px-6 border-b border-white/20">
 
             <h1 class="text-base font-semibold">
-                @yield('page-title', 'Device Management')
+                @yield('page-title', 'Dashboard')
             </h1>
 
-            {{-- ADMIN MENU --}}
+            {{-- USER MENU --}}
+            @if ($user)
             <div x-data="{ open: false }" class="relative">
 
                 <button
                     @click="open = !open"
                     class="w-9 h-9 rounded-full bg-white/20
                            flex items-center justify-center
-                           hover:bg-white/30 transition">
+                           hover:bg-white/30 transition"
+                >
                     <svg xmlns="http://www.w3.org/2000/svg"
                          class="w-5 h-5"
                          fill="none" viewBox="0 0 24 24"
@@ -115,13 +109,13 @@
                         rounded-xl shadow-xl
                         overflow-hidden
                         z-[999]"
-                        >
+                    >
                     <div class="px-4 py-3 border-b">
                         <p class="text-sm font-semibold">
-                            {{ $admin->email }}
+                            {{ $user->email }}
                         </p>
-                        <p class="text-xs text-slate-500">
-                            Administrator
+                        <p class="text-xs text-slate-500 capitalize">
+                            {{ $user->role }}
                         </p>
                     </div>
 
@@ -139,6 +133,7 @@
                     </form>
                 </div>
             </div>
+            @endif
         </header>
 
         {{-- ================= CONTENT ================= --}}

@@ -19,12 +19,23 @@ Route::middleware(['auth', 'admin'])->group(function () {
 });
 
 Route::middleware('auth')->group(function () {
-    Route::get('/upload', [UploadController::class, 'index']);
-    Route::post('/upload', [UploadController::class, 'store']);
-});
 
-Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])
         ->name('dashboard');
+
+    Route::get('/upload', [UploadController::class, 'index'])
+        ->name('upload.index');
+
+    Route::post('/upload', [UploadController::class, 'store'])
+        ->name('upload.store');
+
+    // history upload
+    Route::get('/upload/history', [UploadController::class, 'history'])
+        ->name('upload.history');
+
+    // download ulang
+    Route::get('/upload/{upload}/download', [UploadController::class, 'download'])
+        ->name('upload.download');
+
 });
 
