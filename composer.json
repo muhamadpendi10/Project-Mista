@@ -10,6 +10,7 @@
         "guzzlehttp/guzzle": "^7.10",
         "laravel/framework": "^11.0",
         "ext-gd": "*",
+        "ext-zip": "*",
         "laravel/tinker": "^2.10.1",
         "maatwebsite/excel": "^1.1",
         "phpoffice/phpspreadsheet": "^5.4"
