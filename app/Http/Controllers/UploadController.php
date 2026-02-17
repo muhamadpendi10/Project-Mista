@@ -30,60 +30,61 @@ class UploadController extends Controller
     // ===============================
     public function store(Request $request)
     {
-        $request->validate([
-            'file'        => 'required|file|mimes:txt',
-            'format_type' => 'required|in:format_1,format_2',
-        ]);
+    $request->validate([
+        'file'        => 'nullable|file|mimes:txt',
+        'text_input'  => 'nullable|string',
+        'format_type' => 'required|in:format_1,format_2',
+    ]);
 
-        // kirim ke FastAPI
-        $response = Http::timeout(60)
+    if ($request->hasFile('file')) {
+
+        // ===============================
+        // KIRIM KE ENDPOINT LEGACY
+        // ===============================
+        $response = Http::withoutVerifying()
+            ->timeout(60)
             ->attach(
                 'file',
                 file_get_contents($request->file('file')->getRealPath()),
                 $request->file('file')->getClientOriginalName()
             )
-            ->post('http://127.0.0.1:8001/parse', [
+            ->post(config('services.fastapi.url') . '/parse', [
                 'format_type' => $request->format_type,
             ]);
 
-        if ($response->failed()) {
-            abort(500, 'FastAPI error: ' . $response->body());
-        }
+    } elseif (!empty($request->text_input)) {
 
-        // simpan file hasil
-        $filename = 'wa_' . time() . '.xlsx';
-        $path = 'uploads/' . $filename;
-
-        Storage::disk('public')->put($path, $response->body());
-
-        // hitung total row
-        $spreadsheet = IOFactory::load(
-            storage_path('app/public/' . $path)
+        // ===============================
+        // KIRIM KE RAW ENDPOINT
+        // ===============================
+        $response = Http::withoutVerifying()
+        ->timeout(60)
+        ->withBody($request->text_input, 'text/plain')
+        ->post(
+            config('services.fastapi.url') . '/parse-text-raw?format_type=' . $request->format_type
         );
 
-        $sheet = $spreadsheet->getActiveSheet();
-        $totalRows = max($sheet->getHighestDataRow() - 1, 0);
 
-        // simpan ke database
-        WaUpload::create([
-            'user_id'    => Auth::id(),
-            'filename'   => $filename,
-            'file_path'  => $path,
-            'total_rows' => $totalRows,
-        ]);
-
-        // langsung download
-        return response(
-            $response->body(),
-            200,
-            [
-                'Content-Type' =>
-                    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-                'Content-Disposition' =>
-                    'attachment; filename=hasil.xlsx',
-            ]
-        );
+    } else {
+        return back()->with('error', 'Upload file atau paste text dulu.');
     }
+
+    if ($response->failed()) {
+        abort(500, 'FastAPI error: ' . $response->body());
+    }
+
+    return response(
+        $response->body(),
+        200,
+        [
+            'Content-Type' =>
+                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'Content-Disposition' =>
+                'attachment; filename=hasil.xlsx',
+        ]
+    );
+}
+
 
     // ===============================
     // HISTORY UPLOAD

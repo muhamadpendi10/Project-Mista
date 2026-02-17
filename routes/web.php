@@ -38,4 +38,3 @@ Route::middleware('auth')->group(function () {
         ->name('upload.download');
 
 });
-

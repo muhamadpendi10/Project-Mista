@@ -35,4 +35,9 @@ return [
         ],
     ],
 
+    'fastapi' => [
+    'url' => env('FASTAPI_URL'),
+    ],
+
+
 ];
