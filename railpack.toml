@@ -1,0 +1,2 @@
+﻿[phases.extensions]
+php = ["gd"]
